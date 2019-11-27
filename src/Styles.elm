@@ -22,6 +22,14 @@ link_blue =
     rgb255 50 155 220
 
 
+input_background =
+    rgb255 244 248 248
+
+
+blue =
+    rgb255 5 100 245
+
+
 black =
     rgb255 0 0 0
 

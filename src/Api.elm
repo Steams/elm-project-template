@@ -1,36 +1,14 @@
-module Api exposing (Data, get_data)
+module Api exposing (Data, get_data, login)
 
--- import Json.Decode.Pipeline exposing (required, optional, hardcoded)
 import Http as Http
 import Json.Decode as Decode exposing (Decoder, field, int, string)
+import Json.Encode as Encode
 import RemoteData as RemoteData exposing (RemoteData(..), WebData)
 import Session exposing (Session)
--- import Url.Builder exposing (QueryParameter)
-
-
-
--- apiUrl =
---     "/api"
--- Coresponds to API exposed at : https://jsonplaceholder.typicode.com
 
 
 type Endpoint
     = GetData
-
-
--- toUrl endpoint =
---     case endpoint of
---         GetData ->
---             url [ "albums" ] []
-
-
-
--- TODO What about internal endpoints ?
-
-
--- url : List String -> List QueryParameter -> String
--- url paths queryParams =
---     Url.Builder.crossOrigin "https://jsonplaceholder.typicode.com" paths queryParams
 
 
 type alias Data =
@@ -58,9 +36,31 @@ get_data handler =
     get "https://jsonplaceholder.typicode.com/albums" handler data_list_decoder
 
 
+
 -- get : Endpoint -> (WebData a -> msg) -> Decoder a -> Cmd msg
+
+
 get : String -> (WebData a -> msg) -> Decoder a -> Cmd msg
 get endpoint handler decoder =
     Http.get
         { url = endpoint
-        , expect = Http.expectJson (\ x -> handler (RemoteData.fromResult x)) decoder}
+        , expect = Http.expectJson (\x -> handler (RemoteData.fromResult x)) decoder
+        }
+
+
+login : (WebData String -> msg) -> String -> String -> Cmd msg
+login handler username password =
+    Http.request
+        { method = "POST"
+        , headers = []
+        , url = "http://localhost:8080/api/login"
+        , body =
+            Http.jsonBody <|
+                Encode.object
+                    [ ( "username", Encode.string username )
+                    , ( "password", Encode.string password )
+                    ]
+        , expect = Http.expectJson (RemoteData.fromResult >> handler) string
+        , timeout = Nothing
+        , tracker = Nothing
+        }
