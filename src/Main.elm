@@ -36,11 +36,15 @@ type alias Model =
 -- MODEL
 
 
-init : Session.Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url navKey =
+
+-- init : SessionFlags -> Url -> Nav.Key -> ( Model, Cmd Msg ) -- for running via index.html
+-- init flags url navKey =
+init : () -> Url -> Nav.Key -> ( Model, Cmd Msg ) -- for running via elm-live
+init _ url navKey =
     let
         model =
-            Model (Session.init flags navKey) Redirect
+            Model (Session "" "" navKey) Redirect
+            -- Model (Session.init flags navKey) Redirect
 
         route =
             if model.session.sessionToken == "" then
@@ -217,8 +221,8 @@ view model =
 
 -- MAIN
 
-
-main : Program Session.Flags Model Msg
+-- main : Program Session.Flags Model Msg -- for running via index.html
+main : Program () Model Msg -- for running via elm-live
 main =
     Browser.application
         { init = init
